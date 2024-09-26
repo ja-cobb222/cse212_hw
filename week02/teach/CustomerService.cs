@@ -11,24 +11,55 @@ public class CustomerService {
         // Test Cases
 
         // Test 1
-        // Scenario: 
-        // Expected Result: 
+        // Scenario: Can a customer be added and then served? 
+        // Expected Result: This test should display the customer that was added. 
         Console.WriteLine("Test 1");
-
+        var service = new CustomerService(4);
+        service.AddNewCustomer();
+        service.ServeCustomer();
         // Defect(s) Found: 
 
         Console.WriteLine("=================");
 
         // Test 2
-        // Scenario: 
-        // Expected Result: 
+        // Scenario: Can two customers be served in the correct order?
+        // Expected Result: This test should display the customers in the order they were added. 
         Console.WriteLine("Test 2");
-
+        service = new CustomerService(4);
+        service.AddNewCustomer();
+        service.AddNewCustomer();
+        Console.WriteLine($"Before serving customers: {service}");
+        service.ServeCustomer();
+        service.ServeCustomer();
+        Console.WriteLine($"After serving customers: {service}");
         // Defect(s) Found: 
 
         Console.WriteLine("=================");
 
-        // Add more Test Cases As Needed Below
+        // Test 3
+        // Scenario: Will service be served if there isn't a customer?
+        // Expected Result: This should display an error message
+        Console.WriteLine("Test 3");
+        service = new CustomerService(4);
+        service.ServeCustomer();
+        // Defect(s) Found: This found that I need to check the length in serve_customer and display an error message
+
+        Console.WriteLine("=================");
+
+        // Test 4
+        // Scenario: Does it enforce the max queue size?
+        // Expected Result: This should display an error message once the 5th customer is added
+        Console.WriteLine("Test 4");
+        service = new CustomerService(4);
+        service.AddNewCustomer();
+        service.AddNewCustomer();
+        service.AddNewCustomer();
+        service.AddNewCustomer();
+        service.AddNewCustomer();
+        Console.WriteLine($"Service Queue: {service}");
+        // Defect(s) Found: This found that I need to do >= instead of > in AddNewCustomer
+
+        Console.WriteLine("=================");
     }
 
     private readonly List<Customer> _queue = new();
@@ -88,9 +119,17 @@ public class CustomerService {
     /// Dequeue the next customer and display the information.
     /// </summary>
     private void ServeCustomer() {
-        _queue.RemoveAt(0);
-        var customer = _queue[0];
-        Console.WriteLine(customer);
+        // Are the customers in the queue?
+        if (_queue.Count <= 0) // Defect 2 - Need to check queue length
+        {
+            Console.WriteLine("No Customers in the queue");
+        }
+        else {
+            // Need to read and save the customer before it is deleted from the queue
+            var customer = _queue[0];
+            _queue.RemoveAt(0); // Defect 1 - Delete should be done after
+            Console.WriteLine(customer);
+        }
     }
 
     /// <summary>
