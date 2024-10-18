@@ -14,8 +14,11 @@ public static class Recursion
     /// </summary>
     public static int SumSquaresRecursive(int n)
     {
-        // TODO Start Problem 1
-        return 0;
+        if (n <= 0) {
+            return 0;
+        }
+
+        return (n * n) + SumSquaresRecursive(n - 1);
     }
 
     /// <summary>
@@ -39,7 +42,16 @@ public static class Recursion
     /// </summary>
     public static void PermutationsChoose(List<string> results, string letters, int size, string word = "")
     {
-        // TODO Start Problem 2
+        if (word.Length == size) {
+            results.Add(word);
+            return;
+        }
+
+        for (int i = 0; i < letters.Length; i++) {
+            string remainingLetters = letters.Substring(0, i) + letters.Substring(i + 1);
+
+            PermutationsChoose(results, remainingLetters, size, word + letters[i]);
+        }
     }
 
     /// <summary>
@@ -86,6 +98,12 @@ public static class Recursion
     /// </summary>
     public static decimal CountWaysToClimb(int s, Dictionary<int, decimal>? remember = null)
     {
+        if (remember == null)
+            remember = new Dictionary<int, decimal>();
+
+        if (remember.ContainsKey(s))
+            return remember[s];
+
         // Base Cases
         if (s == 0)
             return 0;
@@ -96,10 +114,13 @@ public static class Recursion
         if (s == 3)
             return 4;
 
-        // TODO Start Problem 3
+        decimal ways =  CountWaysToClimb(s - 1, remember) +
+                        CountWaysToClimb(s - 2, remember) +
+                        CountWaysToClimb(s - 3, remember);
 
-        // Solve using recursion
-        decimal ways = CountWaysToClimb(s - 1) + CountWaysToClimb(s - 2) + CountWaysToClimb(s - 3);
+
+        remember[s] = ways;
+
         return ways;
     }
 
@@ -118,7 +139,18 @@ public static class Recursion
     /// </summary>
     public static void WildcardBinary(string pattern, List<string> results)
     {
-        // TODO Start Problem 4
+        if (!pattern.Contains('*')) {
+            results.Add(pattern);
+            return;
+        }
+
+        int index = pattern.IndexOf('*');
+
+        string patternWith0 = pattern.Substring(0, index) + '0' + pattern.Substring(index + 1);
+        string patternWith1 = pattern.Substring(0, index) + '1' + pattern.Substring(index + 1);
+
+        WildcardBinary(patternWith0, results);
+        WildcardBinary(patternWith1, results);
     }
 
     /// <summary>
@@ -133,11 +165,39 @@ public static class Recursion
             currPath = new List<ValueTuple<int, int>>();
         }
         
-        // currPath.Add((1,2)); // Use this syntax to add to the current path
+        // Add the current position to the path
+    currPath.Add((x, y));
 
-        // TODO Start Problem 5
-        // ADD CODE HERE
+    // Check if the current position is the end
+    if (maze.IsEnd(x, y)) {
+        // If we've reached the end, add the current path to results
+        string formattedPath = $"<List>{{{string.Join(", ", currPath.Select(p => $"({p.Item1}, {p.Item2})"))}}}";
+        results.Add(formattedPath);
 
-        // results.Add(currPath.AsString()); // Use this to add your path to the results array keeping track of complete maze solutions when you find the solution.
+        // Backtrack: remove the current position from the path
+        currPath.RemoveAt(currPath.Count - 1);
+        return;
+    }
+
+    // Explore the four possible directions: right, left, down, up
+    List<(int dx, int dy)> directions = new List<(int, int)> {
+        (1, 0),  // right
+        (-1, 0), // left
+        (0, 1),  // down
+        (0, -1)  // up
+    };
+
+    foreach (var (dx, dy) in directions) {
+        int newX = x + dx;
+        int newY = y + dy;
+
+        // If the move is valid, recurse
+        if (maze.IsValidMove(currPath, newX, newY)) {
+            SolveMaze(results, maze, newX, newY, currPath);
+        }
+    }
+
+    // Backtrack: remove the current position from the path
+    currPath.RemoveAt(currPath.Count - 1);
     }
 }
